@@ -1,6 +1,6 @@
 {
   "min_version_code": 10,
-  "blocked_version_codes": [789],
+  "blocked_version_codes": [799],
   "last_gcu_update": "2026-04-10",
   "last_privacy_policy_update": "2026-03-10",
   "gcu_url": "https://astralarchitect.github.io/TheMeteo-privacy-policy/terms.html",
