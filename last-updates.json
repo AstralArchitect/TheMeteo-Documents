@@ -1,0 +1,22 @@
+{
+  "min_version_code": 10,
+  "blocked_version_codes": [],
+  "last_gcu_update": "2026-04-10",
+  "last_privacy_policy_update": "2026-03-10",
+  "gcu_url": "https://astralarchitect.github.io/TheMeteo-privacy-policy/terms.html",
+  "privacy_policy_url": "https://astralarchitect.github.io/TheMeteo-privacy-policy/privacy.html",
+  "versions": {
+    ">780": {
+      "gcu_url": "https://astralarchitect.github.io/TheMeteo-privacy-policy/v3/terms.html",
+      "privacy_policy_url": "https://astralarchitect.github.io/TheMeteo-privacy-policy/v3/policy.html",
+      "last_gcu_update": "2026-04-10",
+      "last_privacy_policy_update": "2026-04-10"
+    },
+    "<=780": {
+      "gcu_url": "https://astralarchitect.github.io/TheMeteo-privacy-policy/terms.html",
+      "privacy_policy_url": "https://astralarchitect.github.io/TheMeteo-privacy-policy/privacy.html",
+      "last_gcu_update": "2026-01-01",
+      "last_privacy_policy_update": "2026-01-01"
+    }
+  }
+}

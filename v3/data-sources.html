@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utilisation des Données Météorologiques / Weather Data Methodology - TheMeteo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fcfcfc;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        h3 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+        h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            margin-top: 20px;
+        }
+        p, li {
+            font-size: 16px;
+        }
+        ul {
+            margin-bottom: 20px;
+        }
+        .date {
+            text-align: center;
+            font-weight: bold;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+        }
+        .warning {
+            background-color: #fdf5e6;
+            border-left: 4px solid #e67e22;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        .contact {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            word-wrap: break-word;
+        }
+        .divider {
+            margin: 60px 0;
+            border: 0;
+            height: 2px;
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(52, 152, 219, 0.75), rgba(0, 0, 0, 0));
+        }
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .nav-links a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav-links">
+        <a href="terms.html">CGU / Terms</a>
+    </div>
+
+    <div class="nav-links">
+        <a href="#fr">🇫🇷 Version Française</a> | <a href="#en">🇬🇧 English Version</a>
+    </div>
+
+    <div id="fr">
+        <h1>UTILISATION DES DONNÉES MÉTÉOROLOGIQUES</h1>
+        <p class="date">Date de dernière mise à jour : 3 octobre 2026</p>
+
+        <h3>1. Philosophie Scientifique : Pourquoi Trois Horizons Distincts ?</h3>
+        <p>L'atmosphère terrestre est un système dynamique fluide chaotique et non linéaire (théorie de Lorenz). Sa prédictibilité varie considérablement selon l'échelle spatiale et l'horizon temporel considéré. Aucun modèle numérique unique ne peut répondre efficacement à la fois aux exigences d'un orage local dans 2 heures et à l'évolution des ondulations planétaires de Rossby à 12 jours.</p>
+        <p>L'application <strong>TheMeteo</strong> repose sur une architecture scientifique segmentée en trois horizons temporels complémentaires, chacun associé au modèle le plus adapté à sa physique propre :</p>
+        <ul>
+            <li><strong>Court Terme (-12h à +60h) :</strong> Résolution explicite de la convection profonde, des brises thermiques et de l'orographie fine à l'échelle kilométrique via <strong>AROME</strong> de Météo-France (avec secours mondial sur <strong>IFS Court Terme</strong> de l'ECMWF).</li>
+            <li><strong>Moyen Terme (J+2 à J+8 / H+36 à H+204) :</strong> Quantification rigoureuse de l'incertitude atmosphérique par la prévision d'ensemble <strong>ECMWF IFS-ENS</strong> (51 membres), restituée sous forme d'enveloppes probabilistes (centiles P10 / P50 / P90).</li>
+            <li><strong>Long Terme (J+8 à J+14 / 7 jours calendaires) :</strong> Anticipation des régimes météorologiques à grande échelle par le modèle d'intelligence artificielle <strong>ECMWF AIFS-ENS</strong> (50 membres) couplé à un algorithme de classification (HAC Ward) en trois scénarios réalistes.</li>
+        </ul>
+
+        <h3>2. Horizon Court Terme (-12h à +60h) : Convection Haute Résolution</h3>
+        <h4>2.1. Pourquoi le modèle AROME ?</h4>
+        <p>Sur la France métropolitaine et les zones frontalières, TheMeteo utilise le modèle numérique déterministe non-hydrostatique <strong>AROME</strong> (maille de 0,025° ~ 2,5 km). Contrairement aux modèles mondiaux hydrostatiques qui paramétrisent la convection de façon simplifiée, AROME calcule explicitement les mouvements verticaux des cellules orageuses, la microphysique des nuages (glace, grésil, pluie), ainsi que les circulations thermiques locales (brises marines, vents de vallée, inversions de température nocturnes).</p>
+        <p>En dehors du domaine couvert par AROME, TheMeteo bascule de manière transparente sur le modèle mondial <strong>IFS Court Terme</strong> (maille de 0,25° ~ 25 km) de l'ECMWF.</p>
+
+        <h4>2.2. Quelles variables brutes sont téléchargées ?</h4>
+        <p>Les données sont téléchargées à chaque actualisation opérationnelle depuis les dépôts Open Data officiels de Météo-France (dépôt S3 OVHcloud et data.gouv.fr) et l'API WCS opérationnelle :</p>
+        <ul>
+            <li><strong>Paquets déterministes AROME SP1 (Surface Parameters 1) :</strong> 8 tranches de 6 heures (00H06H à 43H48H / 49H51H) fournissant la température à 2 m (<code>2t</code>), l'humidité relative à 2 m (<code>2r</code>), la pression au niveau de la mer (<code>msl</code>), les composantes vectorielles du vent à 10 m (<code>10u</code>, <code>10v</code>), les rafales de vent à 10 m (<code>10fg</code>), les précipitations totales cumulées et horaires (<code>tp</code> / <code>tirf</code>), les précipitations neigeuses (<code>sf</code>), le grésil et la neige roulée (<code>graupel_precipitation</code>), les précipitations d'eau liquide (<code>water_precipitation</code>), ainsi que les nébulosités par étage (totale <code>tcc</code>, basse <code>lcc</code>, moyenne <code>mcc</code>, haute <code>hcc</code>).</li>
+            <li><strong>Ensemble PE-AROME (17 membres) :</strong> Récupération ciblée via WCS des cumuls de pluie et de la densité d'impacts de foudre cumulée (<code>lightning_density_cumulated</code>) pour le calcul probabiliste fin des averses.</li>
+        </ul>
+
+        <h4>2.3. Comment sont-elles traitées ?</h4>
+        <p>Les variables brutes subissent une chaîne de calculs thermodynamiques et spatio-temporels vectorisés :</p>
+        <ul>
+            <li><strong>Température ressentie :</strong> Calculée selon la formule universelle de Steadman / BOM combinant la température de l'air, la pression partielle de vapeur d'eau issue de la formule de Magnus-Tetens (effet de lourdeur / humidex), et la vitesse du vent à 10 m (refroidissement éolien / wind chill).</li>
+            <li><strong>Probabilité de précipitation (PoP 0-100%) :</strong> Calculée par un moteur spatio-temporel continu hybride. Lorsque les membres perturbés PE-AROME sont disponibles, leurs cumuls tri-horaires sont désagrégés à l'heure selon la dynamique du membre déterministe. Une convolution spatiale sur un voisinage de 5x5 mailles (~12,5 km de rayon, méthode de Roberts & Lean 2008) est appliquée à l'ensemble des membres pour modéliser le déplacement incertain des averses. Une régularisation bayésienne prévient les 0% artificiels sous ciel saturé et couvert. En mode déterministe pur, une fonction de saturation exponentielle continue différentiable <code>1 - exp(-R / 0,40)</code> remplace tout palier artificiel, complétée d'un lissage temporel glissant sur &plusmn;1h.</li>
+            <li><strong>Probabilité d'orage et foudre (0-100%) :</strong> Calculée à partir de la physique convective explicite d'AROME : flux de grésil/graupel (séparation des charges électrostatiques selon la théorie de Takahashi), intensité de pluie convective, front de rafales sous cellule (différence rafale - vent moyen > 5 m/s), convolution spatiale 2D (rayon 12,5 km) et filtre temporel &plusmn;1h.</li>
+            <li><strong>Déduction du code de temps sensible WMO (OMM 4677) :</strong> Un arbre de décision vectoriel évalue les conditions physiques par ordre de sévérité :
+                <ol>
+                    <li>Orages et grêle (WMO 95, 96, 99) prioritaires dès que le risque orageux ou le grésil dépasse les seuils critiques.</li>
+                    <li>Précipitations solides et mixtes : grésil (77), neige continue ou en averses (71, 73, 75, 85, 86), pluie et neige mêlées (68, 69, 83), et pluie verglaçante (66, 67 si la température au sol est négative).</li>
+                    <li>Précipitations liquides : bruine (51), averses convectives (80, 81, 82) ou pluie stratiforme continue (61, 63, 65).</li>
+                    <li>Brouillard et brume : détection 100% physique par calcul du point de rosée (Magnus-Tetens) et de la dépression $T - T_d \le 0,9^\circ\text{C}$, avec humidité $\ge 95\%$, présence d'eau liquide condensée en basse couche (nuages bas $\ge 60\%$) et vent calme ($\le 3,2\text{ m/s}$ pour le brouillard de rayonnement WMO 45/48 givrant, ou vent modéré pour le brouillard d'advection côtière).</li>
+                    <li>Régimes de temps sec : ciel voilé de cirrus (WMO 4 si les nuages hauts dominent largement), ciel clair (0), peu nuageux (1), éclaircies (2) ou couvert (3).</li>
+                </ol>
+            </li>
+        </ul>
+
+        <h3>3. Horizon Moyen Terme (J+2 à J+8 / H+36 à H+204) : La Prévision d'Ensemble</h3>
+        <h4>3.1. Pourquoi la prévision d'ensemble ?</h4>
+        <p>Au-delà de 48 heures, l'atmosphère présente une sensibilité extrême aux conditions initiales (effet papillon). Présenter une seule courbe déterministe à J+5 donnerait une illusion trompeuse de précision tout en masquant le risque de scénarios alternatifs sévères. La prévision d'ensemble <strong>ECMWF IFS-ENS</strong> (51 membres à 0,25° de résolution, soit 50 simulations perturbées et 1 simulation de contrôle) explore la diversité des trajectoires possibles.</p>
+        <p>Plutôt que d'écraser cette richesse, TheMeteo extrait la distribution statistique complète des scénarios pour chaque paramètre météorologique.</p>
+
+        <h4>3.2. Quelles variables brutes sont téléchargées ?</h4>
+        <p>Chaque cycle de calcul télécharge les 51 membres de l'ensemble IFS Open Data sur 58 échéances temporelles :</p>
+        <ul>
+            <li><strong>Paramètres de surface :</strong> Température à 2 m (<code>2t</code>), point de rosée à 2 m (<code>2d</code>), composantes du vent à 10 m (<code>10u</code>, <code>10v</code>), rafales de vent à 10 m (<code>10fg</code> / <code>10fg3</code>), pression au niveau de la mer (<code>msl</code>), précipitations totales (<code>tp</code>), chutes de neige (<code>sf</code>), nébulosité totale (<code>tcc</code>), et énergie potentielle convective disponible (<code>mucape</code>).</li>
+            <li><strong>Niveaux de pression en altitude :</strong> Températures à 925, 850 et 700 hPa (<code>t</code>) ainsi que les vitesses verticales à 700 et 500 hPa (<code>w</code>) pour le diagnostic d'instabilité 3D.</li>
+        </ul>
+
+        <h4>3.3. Comment sont-elles traitées ?</h4>
+        <ul>
+            <li><strong>Tri par centiles (P10 / Médiane P50 / P90) :</strong> Pour chaque point GPS et chaque pas de temps, les 50 simulations sont triées par ordre croissant :
+                <ul>
+                    <li><strong>P10 (10ᵉ centile) :</strong> Scénario bas (ex : températures fraîches, vent calme). Seuls 10% des membres prévoient une valeur inférieure.</li>
+                    <li><strong>P50 (Médiane) :</strong> Scénario central le plus probable, imperméable aux valeurs extrêmes isolées.</li>
+                    <li><strong>P90 (90ᵉ centile) :</strong> Scénario haut (ex : pic de chaleur, rafales maximales probables). Seuls 10% des membres prévoient une valeur supérieure.</li>
+                </ul>
+                Ces centiles sont calculés pour la température, la température ressentie, l'humidité relative, la pression atmosphérique, le vent moyen et les rafales.
+            </li>
+            <li><strong>Probabilité de précipitation (PoP) :</strong> Calculée comme le pourcentage exact des membres de l'ensemble simulant un cumul horaire mesurable supérieur ou égal à 0,1 mm/h.</li>
+            <li><strong>Probabilité d'instabilité et d'orage (<code>probability_of_instability</code>) :</strong> Calculée par évaluation thermodynamique tridimensionnelle sur chacun des 50 membres : calcul des gradients verticaux de température entre couches, détection d'éventuelles couches d'inversion thermique bloquantes (couvercle convectif), et forçage dynamique vertical d'altitude ($w_{700} \le -0,4\text{ Pa/s}$ ou $w_{500} \le -0,6\text{ Pa/s}$). Quatre modes d'initiation convective physique sont modélisés (libre, forcée, explosive et nocturne élevée). Le pourcentage de membres déclenchant l'un de ces modes constitue la probabilité d'instabilité.</li>
+            <li><strong>Code WMO moyen terme :</strong> Déduit des régimes médians pour restituer l'ambiance météo la plus probable sans biaiser l'affichage par des signaux orageux marginaux non représentatifs.</li>
+        </ul>
+
+        <h3>4. Horizon Long Terme (J+8 à J+14) : Intelligence Artificielle et Scénarios Météorologiques</h3>
+        <h4>4.1. Pourquoi le modèle AIFS et pourquoi des scénarios clustérisés ?</h4>
+        <p>À l'horizon de 7 à 14 jours, les modèles physiques conventionnels ont tendance à disperser excessivement leurs prévisions ou à atténuer les contrastes à grande échelle. Le modèle d'intelligence artificielle <strong>ECMWF AIFS-ENS</strong> (réseau de neurones profond entraîné sur 40 ans de réanalyses ERA5) préserve des structures baroclines d'une netteté exceptionnelle à longue échéance.</p>
+        <p><strong>Le piège de la moyenne d'ensemble classique :</strong> Calculer la moyenne arithmétique de 50 membres à J+10 aboutit à un résultat météorologiquement absurde : les dépressions creuses sont gommées, les coups de vent disparaissent au profit d'une brise uniforme à 15 km/h, et une pluie fine artificielle est étalée partout. Pour éviter cet écueil, TheMeteo applique un algorithme de <strong>clustérisation statistique</strong> qui regroupe les 50 simulations en <strong>trois scénarios physiques cohérents</strong>.</p>
+
+        <h4>4.2. Quelles variables brutes sont téléchargées ?</h4>
+        <p>Les 50 membres d'AIFS-ENS sont téléchargés sur toutes les échéances de J+8 à J+14 : température à 2 m (<code>2t</code>), point de rosée à 2 m (<code>2d</code>), composantes du vent à 10 m (<code>10u</code>, <code>10v</code>), rafales (<code>10fg</code>), pression au niveau de la mer (<code>msl</code>), précipitations totales (<code>tp</code>), et nébulosité totale (<code>tcc</code>).</p>
+
+        <h4>4.3. Comment sont-elles traitées ?</h4>
+        <ul>
+            <li><strong>Alignement sur le cycle diurne solaire :</strong> La Terre étant divisée en fuseaux horaires, les points géographiques mondiaux sont répartis en deux hémisphères dynamiques : Hémisphère Est (Mode A : fenêtre de -18h à +18h autour de 00:00 UTC) et Hémisphère Ouest (Mode B : fenêtre de -6h à +30h). Chaque journée calendaire est ainsi découpée en 4 pas de temps de 6 heures parfaitement calés sur l'aube, le midi solaire, le crépuscule et la nuit locale.</li>
+            <li><strong>Clustérisation hiérarchique ascendante (HAC Ward) :</strong> Pour chaque point, un vecteur de 16 variables physiques normalisées (température, pression, pluie, nébulosité sur les 4 pas de la journée) est construit pour chacun des 50 membres. L'algorithme de Ward regroupe les membres présentant la même dynamique météorologique en 3 scénarios distincts, classés par probabilité décroissante ($M / 50 \times 100\%$).</li>
+            <li><strong>Structure interne de chaque scénario :</strong> Chaque scénario conserve ses propres centiles P10 / P50 / P90 (température, vent, rafales, pression, humidité), sa médiane de pluie et de visibilité (modélisée selon l'humidité et le taux de précipitation), ainsi que son code WMO calculé pour chaque moment de la journée.</li>
+        </ul>
+
+        <h3>5. Licences Légales et Attribution Open Data</h3>
+        <p>L'exploitation des données météorologiques par TheMeteo s'inscrit dans le strict respect des licences Open Data applicables :</p>
+        <ul>
+            <li><strong>Météo-France :</strong> Données météorologiques publiques (modèle AROME et vigilances) réutilisées conformément aux dispositions de la <em>Licence Ouverte version 2.0 (Etalab)</em>.</li>
+            <li><strong>ECMWF (Centre Européen pour les Prévisions Météorologiques à Moyen Terme) :</strong> Données numériques et ensemblistes mondiales (modèles IFS, IFS-ENS et AIFS-ENS) réutilisées dans le cadre du programme ECMWF Open Data sous licence <em>Creative Commons Attribution 4.0 International (CC-BY 4.0)</em>.</li>
+            <li><strong>EUMETSAT :</strong> Imagerie satellitaire réutilisée sous les conditions d'utilisation applicables aux données de télédétection opérationnelles européennes.</li>
+        </ul>
+
+        <h3>6. Avertissement Légal de Sécurité</h3>
+        <div class="warning">
+            <strong>Rappel de sécurité civile :</strong> Les prévisions météorologiques fournies par l'Application résultent de calculs scientifiques probabilistes et de modélisations numériques de l'atmosphère. Elles sont fournies à titre indicatif et ne constituent en aucun cas des avis de sécurité civile certifiés pour la sauvegarde de la vie humaine (<em>Safety of Life</em>). En cas de situation météorologique à risque, les bulletins de vigilance, avertissements et consignes émis par les autorités publiques officielles et les services de secours prévalent en toutes circonstances.
+        </div>
+
+        <h3>7. Contact et Transparence</h3>
+        <p>Pour toute question relative aux données et aux modèles météorologiques :</p>
+        <p class="contact">matthieu.dev.poncet@gmail.com</p>
+    </div>
+
+    <hr class="divider">
+
+    <div id="en">
+        <h1>WEATHER DATA METHODOLOGY & USAGE</h1>
+        <p class="date">Last updated: October 3, 2026</p>
+
+        <h3>1. Scientific Philosophy: Why Three Distinct Horizons?</h3>
+        <p>The Earth's atmosphere is a chaotic, non-linear fluid dynamical system (Lorenz 1963). Its predictability varies dramatically across different spatial scales and lead times. No single numerical weather prediction model can simultaneously resolve a localized thunderstorm in 2 hours and planetary Rossby wave dynamics at 12 days.</p>
+        <p>The <strong>TheMeteo</strong> application relies on a segmented three-tier architecture, pairing each time horizon with the model engineered specifically for its underlying physics:</p>
+        <ul>
+            <li><strong>Short Term (-12h to +60h):</strong> Explicit resolution of deep convection, thermal breezes, and fine topography at kilometer scale via Météo-France's <strong>AROME</strong> (with global fallback on ECMWF's <strong>IFS Short Term</strong>).</li>
+            <li><strong>Medium Term (Day 2 to Day 8 / H+36 to H+204):</strong> Rigorous quantification of atmospheric uncertainty via the 51-member <strong>ECMWF IFS-ENS</strong> ensemble, presented as probabilistic envelopes (percentiles P10 / P50 / P90).</li>
+            <li><strong>Long Term (Day 8 to Day 14 / 7 calendar days):</strong> Extended atmospheric regime forecasting via ECMWF's 50-member deep-learning model <strong>AIFS-ENS</strong>, paired with a clustering algorithm (Ward's HAC) grouped into three realistic weather scenarios.</li>
+        </ul>
+
+        <h3>2. Short-Term Horizon (-12h to +60h): High-Resolution Convective Physics</h3>
+        <h4>2.1. Why the AROME model?</h4>
+        <p>Over mainland France and adjacent border regions, TheMeteo uses Météo-France's deterministic non-hydrostatic fine-mesh model <strong>AROME</strong> (0.025° ~ 2.5 km resolution). Unlike global hydrostatic models that parameterize convection with simplified formulas, AROME explicitly calculates vertical updrafts within convective storm cells, microphysics (ice, graupel, rain), and local thermal circulations (sea breezes, valley winds, nocturnal temperature inversions).</p>
+        <p>Outside the geographical domain of AROME, TheMeteo automatically falls back to ECMWF's global <strong>IFS Short Term</strong> model (0.25° ~ 25 km resolution).</p>
+
+        <h4>2.2. Which raw variables are downloaded?</h4>
+        <p>Data is ingested during every operational model run from official Météo-France Open Data endpoints (S3 OVHcloud repository and data.gouv.fr) alongside the operational WCS API:</p>
+        <ul>
+            <li><strong>AROME Deterministic SP1 Packages (Surface Parameters 1):</strong> Eight 6-hour tranches (00H06H through 43H48H / 49H51H) providing 2-meter temperature (<code>2t</code>), 2-meter relative humidity (<code>2r</code>), mean sea-level pressure (<code>msl</code>), 10-meter wind vector components (<code>10u</code>, <code>10v</code>), 10-meter wind gusts (<code>10fg</code>), total accumulated and hourly precipitation (<code>tp</code> / <code>tirf</code>), snowfall (<code>sf</code>), graupel and snow pellets (<code>graupel_precipitation</code>), pure liquid precipitation (<code>water_precipitation</code>), and multi-layer cloud cover (total <code>tcc</code>, low <code>lcc</code>, medium <code>mcc</code>, high <code>hcc</code>).</li>
+            <li><strong>PE-AROME Ensemble (17 members):</strong> Targeted WCS extraction of ensemble precipitation cumulations and accumulated lightning flash density (<code>lightning_density_cumulated</code>) for calibrated shower risk estimation.</li>
+        </ul>
+
+        <h4>2.3. How are they processed?</h4>
+        <p>Raw variables undergo vectorized thermodynamic and spatio-temporal post-processing:</p>
+        <ul>
+            <li><strong>Apparent Temperature (Feels Like):</strong> Evaluated using the universal Steadman / BOM equation combining 2m temperature, water vapor partial pressure from Magnus-Tetens (muggliness / humidex), and 10m wind speed (wind chill effect).</li>
+            <li><strong>Probability of Precipitation (PoP 0-100%):</strong> Computed using a continuous spatio-temporal hybrid engine. When perturbed PE-AROME members are available, their 3-hourly cumulations are physically disaggregated to hourly rates guided by the deterministic member's intensity profile. A 5x5 grid spatial neighborhood convolution (~12.5 km radius, Roberts & Lean 2008) is applied across all members to account for convective spatial displacement. A Bayesian moisture prior prevents unrealistic 0% values under overcast, saturated skies. In deterministic mode, a continuous differentiable exponential saturation function <code>1 - exp(-R / 0.40)</code> replaces artificial thresholds, complemented by a &plusmn;1h sliding temporal smoothing window.</li>
+            <li><strong>Thunderstorm and Lightning Probability (0-100%):</strong> Derived from AROME's explicit convective physics: graupel precipitation flux (non-inductive electrostatic charge separation via Takahashi's graupel-ice collision theory), convective rainfall rate, downdraft gust front differential (gust minus mean wind > 5 m/s), 2D spatial convolution (12.5 km radius), and &plusmn;1h temporal filtering.</li>
+            <li><strong>WMO Weather Code Deduction (WMO 4677):</strong> A hierarchical vectorized decision tree classifies atmospheric conditions in order of severity:
+                <ol>
+                    <li>Thunderstorms and hail (WMO 95, 96, 99) receive absolute priority whenever storm probability or graupel rates exceed critical thresholds.</li>
+                    <li>Solid and mixed precipitation: graupel (77), pure snowfall (71, 73, 75, 85, 86), rain/snow mix (68, 69, 83), and freezing rain (66, 67 if ground temperatures are sub-zero).</li>
+                    <li>Liquid precipitation: drizzle (51), convective rain showers (80, 81, 82), or continuous stratiform rain (61, 63, 65).</li>
+                    <li>Fog and mist: 100% thermodynamic detection via dew point calculation (Magnus-Tetens) and spread $T - T_d \le 0.9^\circ\text{C}$, relative humidity $\ge 95\%$, condensed boundary-layer liquid water (low cloud cover $\ge 60\%$), and light wind ($\le 3.2\text{ m/s}$ for radiation fog WMO 45/48 freezing, or moderate wind for coastal advection fog).</li>
+                    <li>Dry weather regimes: veiled cirrus sky (WMO 4 when high clouds heavily dominate), clear sky (0), mainly clear (1), partly cloudy (2), or overcast (3).</li>
+                </ol>
+            </li>
+        </ul>
+
+        <h3>3. Medium-Term Horizon (Day 2 to Day 8 / H+36 to H+204): Ensemble Forecasting</h3>
+        <h4>3.1. Why ensemble forecasting?</h4>
+        <p>Beyond 48 hours, atmospheric dynamics become acutely sensitive to minor initial condition uncertainties (the butterfly effect). Displaying a single deterministic trajectory at Day 5 gives a misleading illusion of precision while concealing severe alternative possibilities. The <strong>ECMWF IFS-ENS</strong> ensemble (51 members at 0.25° resolution: 50 perturbed simulations plus 1 unperturbed control simulation) samples the full spectrum of possible atmospheric evolutions.</p>
+        <p>Instead of averaging away these scenarios, TheMeteo computes the complete statistical probability distribution for each meteorological parameter.</p>
+
+        <h4>3.2. Which raw variables are downloaded?</h4>
+        <p>Each computational cycle downloads all 51 members of the IFS Open Data dataset across 58 time steps:</p>
+        <ul>
+            <li><strong>Surface Parameters:</strong> 2m temperature (<code>2t</code>), 2m dew point (<code>2d</code>), 10m wind components (<code>10u</code>, <code>10v</code>), 10m wind gusts (<code>10fg</code> / <code>10fg3</code>), mean sea-level pressure (<code>msl</code>), total precipitation (<code>tp</code>), snowfall (<code>sf</code>), total cloud cover (<code>tcc</code>), and Most Unstable Convective Available Potential Energy (<code>mucape</code>).</li>
+            <li><strong>Upper-Air Pressure Levels:</strong> Temperatures at 925, 850, and 700 hPa (<code>t</code>) along with vertical velocities at 700 and 500 hPa (<code>w</code>) for 3D convective instability analysis.</li>
+        </ul>
+
+        <h4>3.3. How are they processed?</h4>
+        <ul>
+            <li><strong>Percentile Envelopes (P10 / Median P50 / P90):</strong> For each geographical grid point and time step, the 50 perturbed simulations are sorted in ascending order:
+                <ul>
+                    <li><strong>P10 (10th Percentile):</strong> Lower envelope scenario (e.g. cold conditions, calm wind). Only 10% of members forecast lower values.</li>
+                    <li><strong>P50 (Median):</strong> Central, most probable scenario, immune to isolated unrepresentative outliers.</li>
+                    <li><strong>P90 (90th Percentile):</strong> Upper envelope scenario (e.g. heat wave peak, severe gales). Only 10% of members forecast higher values.</li>
+                </ul>
+                These percentiles are evaluated for temperature, apparent temperature, relative humidity, pressure, average wind, and wind gusts.
+            </li>
+            <li><strong>Probability of Precipitation (PoP):</strong> Computed as the exact percentage of ensemble members predicting measurable hourly precipitation $\ge 0.1\text{ mm/h}$.</li>
+            <li><strong>Convective Instability and Thunderstorm Probability (<code>probability_of_instability</code>):</strong> Evaluated across all 50 members using full 3D thermodynamics: inter-layer lapse rates, thermal capping inversion detection (convective lid), and upper-air dynamic updrafts ($w_{700} \le -0.4\text{ Pa/s}$ or $w_{500} \le -0.6\text{ Pa/s}$). Four physical initiation modes are modeled (free, forced, explosive, and elevated nocturnal). The percentage of members triggering convection forms the instability probability.</li>
+            <li><strong>Medium-Term WMO Code:</strong> Derived from median ensemble regimes to portray the dominant weather condition without amplifying marginal storm signals.</li>
+        </ul>
+
+        <h3>4. Long-Term Horizon (Day 8 to Day 14): AI and Clustered Weather Scenarios</h3>
+        <h4>4.1. Why the AIFS model and why clustered scenarios?</h4>
+        <p>Between 7 and 14 days, traditional physical models often suffer from excessive ensemble spread or numerical diffusion. ECMWF's deep learning model <strong>AIFS-ENS</strong> (trained on 40 years of ERA5 reanalyses) preserves sharp, coherent large-scale baroclinic structures well into the extended range.</p>
+        <p><strong>The failure of standard ensemble averaging:</strong> Taking a simple arithmetic average of 50 members at Day 10 produces meteorologically unrealistic forecasts: deep low-pressure systems are flattened, gale-force winds are diluted into uniform 15 km/h breezes, and artificial light drizzle covers vast geographic expanses. To solve this, TheMeteo deploys an unsupervised <strong>clustering algorithm</strong> that classifies the 50 simulations into <strong>three distinct, physically realistic scenarios</strong>.</p>
+
+        <h4>4.2. Which raw variables are downloaded?</h4>
+        <p>All 50 members of AIFS-ENS are downloaded across all lead times from Day 8 to Day 14: 2m temperature (<code>2t</code>), 2m dew point (<code>2d</code>), 10m wind components (<code>10u</code>, <code>10v</code>), wind gusts (<code>10fg</code>), mean sea-level pressure (<code>msl</code>), total precipitation (<code>tp</code>), and total cloud cover (<code>tcc</code>).</p>
+
+        <h4>4.3. How are they processed?</h4>
+        <ul>
+            <li><strong>Solar Diurnal Cycle Alignment:</strong> Because local solar time varies by longitude, global grid points are dynamically partitioned into two hemispheres: Eastern Hemisphere (Mode A: -18h to +18h window around UTC midnight) and Western Hemisphere (Mode B: -6h to +30h window). Each calendar day is divided into four 6-hour time steps aligned with dawn, solar noon, dusk, and local nighttime.</li>
+            <li><strong>Hierarchical Agglomerative Clustering (Ward's HAC):</strong> At each grid point, a 16-variable normalized vector (temperature, pressure, precipitation, and cloud cover across the 4 diurnal steps) is constructed for each of the 50 members. Ward's minimum variance method groups members sharing similar physical trajectories into 3 distinct clusters, ordered by probability ($M / 50 \times 100\%$).</li>
+            <li><strong>Internal Scenario Structure:</strong> Each scenario retains its own P10 / P50 / P90 envelopes (temperature, wind, gusts, pressure, humidity), median precipitation, visibility (modeled from relative humidity and rainfall intensity), and diurnal WMO weather codes.</li>
+        </ul>
+
+        <h3>5. Legal Framework & Open Data Attribution</h3>
+        <p>The processing and dissemination of meteorological data by TheMeteo comply with all applicable Open Data licenses:</p>
+        <ul>
+            <li><strong>Météo-France:</strong> Public weather datasets (AROME model and severe weather vigilance) reused under the terms of the French <em>Licence Ouverte version 2.0 (Etalab)</em>.</li>
+            <li><strong>ECMWF (European Centre for Medium-Range Weather Forecasts):</strong> Global numerical and ensemble models (IFS, IFS-ENS, and AIFS-ENS) reused under the ECMWF Open Data framework under the <em>Creative Commons Attribution 4.0 International license (CC-BY 4.0)</em>.</li>
+            <li><strong>EUMETSAT:</strong> Operational European meteorological satellite imagery reused under standard EUMETSAT data dissemination conditions.</li>
+        </ul>
+
+        <h3>6. Civil Safety Disclaimer</h3>
+        <div class="warning">
+            <strong>Safety Warning:</strong> Weather forecasts provided by the Application result from complex numerical modeling and probabilistic simulations. They are provided for informational purposes only and do not constitute certified civil safety directives for the protection of life or property (<em>Safety of Life</em>). During hazardous meteorological conditions, official warnings, directives, and evacuation orders issued by government civil safety agencies and emergency services take precedence under all circumstances.
+        </div>
+
+        <h3>7. Scientific Contact & Inquiries</h3>
+        <p>For questions regarding our weather data and meteorological models:</p>
+        <p class="contact">matthieu.dev.poncet@gmail.com</p>
+    </div>
+
+</body>
+</html>
