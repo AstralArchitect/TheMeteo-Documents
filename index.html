@@ -1,97 +1,242 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
-  <title>TheMeteo — Static Documents Server</title>
-  <style>
-    :root {
-      color-scheme: light dark;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px;
-      box-sizing: border-box;
-      background-color: #f8fafc;
-      color: #0f172a;
-    }
-    @media (prefers-color-scheme: dark) {
-      body {
-        background-color: #0f172a;
-        color: #f8fafc;
-      }
-      .card {
-        background-color: #1e293b !important;
-        border-color: #334155 !important;
-      }
-      p {
-        color: #cbd5e1 !important;
-      }
-    }
-    .card {
-      max-width: 520px;
-      background: #ffffff;
-      padding: 32px;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-    .badge {
-      display: inline-block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 4px 10px;
-      border-radius: 9999px;
-      background-color: rgba(56, 189, 248, 0.15);
-      color: #0284c7;
-      margin-bottom: 16px;
-    }
-    @media (prefers-color-scheme: dark) {
-      .badge {
-        color: #38bdf8;
-      }
-    }
-    h1 {
-      font-size: 1.25rem;
-      margin: 0 0 12px 0;
-    }
-    p {
-      font-size: 0.95rem;
-      line-height: 1.6;
-      color: #475569;
-      margin: 0;
-    }
-    a {
-      color: #0284c7;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    @media (prefers-color-scheme: dark) {
-      a {
-        color: #38bdf8;
-      }
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation Légale - AstralArchitect</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fcfcfc;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        h3 {
+            color: #2980b9;
+            margin-top: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            margin-top: 20px;
+        }
+        p, li {
+            font-size: 16px;
+        }
+        ul {
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        a {
+            color: #2980b9;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        a:hover {
+            color: #3498db;
+            text-decoration: underline;
+        }
+        .date {
+            text-align: center;
+            font-weight: bold;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+        }
+        .update-date {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-left: 6px;
+        }
+        .info-box {
+            background-color: #f4f9fd;
+            border-left: 4px solid #3498db;
+            padding: 12px 15px;
+            margin: 20px 0;
+        }
+        .warning {
+            background-color: #fdf5e6;
+            border-left: 4px solid #e67e22;
+            padding: 10px 15px;
+            margin: 20px 0;
+        }
+        .badge {
+            display: inline-block;
+            background-color: #e67e22;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .badge-ok {
+            background-color: #27ae60;
+        }
+    </style>
 </head>
 <body>
-  <main class="card">
-    <span class="badge">Static Assets &amp; API</span>
-    <h1>TheMeteo App Resources</h1>
-    <p>
-      This repository contains legal and additional server documents necessary for the proper functioning of the <strong>TheMeteo</strong> app. 
-      The content of this repository is mirrored to <a href="https://themeteodocs.19374629.xyz">themeteodocs.19374629.xyz</a>.
-    </p>
-  </main>
+
+    <h1>DOCUMENTATION LÉGALE</h1>
+    <p class="date">Application météorologique — AstralArchitect</p>
+
+    <div id="app-content">
+        <p>Chargement de la configuration en cours...</p>
+    </div>
+
+    <script>
+        // Dictionnaire pour traduire proprement les clés connues (et gérer automatiquement les nouvelles)
+        const DOC_LABELS = {
+            gcu: "Conditions Générales d'Utilisation (CGU)",
+            privacy_policy: "Politique de Confidentialité",
+            data_sources: "Sources de données"
+        };
+
+        function formatDateFR(isoDate) {
+            if (!isoDate) return null;
+            const parts = String(isoDate).split('-');
+            if (parts.length !== 3) return isoDate;
+            const date = new Date(parts[0], parts[1] - 1, parts[2]);
+            if (isNaN(date)) return isoDate;
+            return date.toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function formatKeyName(prefix) {
+            if (DOC_LABELS[prefix]) return DOC_LABELS[prefix];
+            return prefix
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        // Génère dynamiquement une liste <ul> à partir de n'importe quel objet contenant des clés *_url
+        function createDocList(obj) {
+            const ul = document.createElement('ul');
+            let hasItems = false;
+
+            Object.keys(obj).forEach(key => {
+                if (key.endsWith('_url') && obj[key]) {
+                    hasItems = true;
+                    const prefix = key.slice(0, -4); // Retire "_url"
+                    const dateKey = `last_${prefix}_update`;
+                    const rawDate = obj[dateKey];
+
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = obj[key];
+                    a.textContent = formatKeyName(prefix);
+                    li.appendChild(a);
+
+                    if (rawDate) {
+                        const span = document.createElement('span');
+                        span.className = 'update-date';
+                        span.textContent = `(Dernière mise à jour : ${formatDateFR(rawDate)})`;
+                        li.appendChild(span);
+                    }
+
+                    ul.appendChild(li);
+                }
+            });
+
+            return hasItems ? ul : null;
+        }
+
+        fetch('./last-updates.json')
+            .then(response => {
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return response.json();
+            })
+            .then(data => {
+                const container = document.getElementById('app-content');
+                container.innerHTML = '';
+
+                // 1. Bloc État des versions (min_version_code & blocked_version_codes)
+                const statusSection = document.createElement('div');
+                statusSection.className = 'info-box';
+
+                const minVersion = data.min_version_code !== undefined ? data.min_version_code : 'Non défini';
+                const blocked = Array.isArray(data.blocked_version_codes) ? data.blocked_version_codes : [];
+
+                let blockedHTML = '<span class="badge badge-ok">Aucune</span>';
+                if (blocked.length > 0) {
+                    blockedHTML = blocked.map(code => `<span class="badge">${code}</span>`).join(' ');
+                }
+
+                statusSection.innerHTML = `
+                    <strong>Restrictions des versions de l'Application :</strong>
+                    <ul style="margin-bottom: 0; margin-top: 8px;">
+                        <li><strong>Version minimale requise (<code>min_version_code</code>) :</strong> ${minVersion}</li>
+                        <li><strong>Versions bloquées (<code>blocked_version_codes</code>) :</strong> ${blockedHTML}</li>
+                    </ul>
+                `;
+                container.appendChild(statusSection);
+
+                // 2. Documents par défaut définis à la racine du JSON
+                const rootList = createDocList(data);
+                if (rootList) {
+                    const h3Root = document.createElement('h3');
+                    h3Root.textContent = 'Documents généraux (Par défaut)';
+                    container.appendChild(h3Root);
+                    container.appendChild(rootList);
+                }
+
+                // 3. Génération dynamique de chaque section présente dans "versions"
+                if (data.versions && typeof data.versions === 'object') {
+                    Object.entries(data.versions).forEach(([versionRange, versionData]) => {
+                        const h3 = document.createElement('h3');
+                        h3.textContent = `Version ${versionRange}`;
+                        container.appendChild(h3);
+
+                        const versionList = createDocList(versionData);
+                        if (versionList) {
+                            container.appendChild(versionList);
+                        }
+
+                        // Affiche automatiquement toute autre propriété personnalisée ajoutée dans une version
+                        Object.entries(versionData).forEach(([k, v]) => {
+                            if (!k.endsWith('_url') && !k.startsWith('last_')) {
+                                const p = document.createElement('p');
+                                p.innerHTML = `<strong>${k} :</strong> ${ JSON.stringify(v) }`;
+                                container.appendChild(p);
+                            }
+                        });
+                    });
+                }
+
+                // 4. Pied de page avec lien vers le JSON brut
+                const footerWarning = document.createElement('div');
+                footerWarning.className = 'warning';
+                footerWarning.innerHTML = `
+                    <strong>Source de configuration :</strong> Cette page est générée automatiquement à partir du fichier <a href="./last-updates.json">last-updates.json</a>.
+                `;
+                container.appendChild(footerWarning);
+            })
+            .catch(err => {
+                document.getElementById('app-content').innerHTML = `
+                    <div class="warning">
+                        <strong>Erreur de chargement :</strong> Impossible de lire le fichier <code>last-updates.json</code> (${err.message}). 
+                        Assurez-vous d'ouvrir cette page via un serveur web (ex: Live Server) et non directement en <code>file://</code>.
+                    </div>
+                `;
+            });
+    </script>
+
 </body>
 </html>
